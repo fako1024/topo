@@ -1,6 +1,6 @@
 # Topological Sort for arbitrary slices
 
-[ ![Build Status](https://app.codeship.com/projects/6b3f9840-da5f-0134-d6f9-3e892a3f83ae/status?branch=master)](https://app.codeship.com/projects/203641)
+[ ![Build Status](https://app.codeship.com/projects/04cf1b10-da68-0134-0795-3a4993b56c58/status?branch=master)](https://app.codeship.com/projects/203652)
 
 Introduction
 ------------

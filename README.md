@@ -1,7 +1,7 @@
 # Topological Sort for arbitrary slices
 
-master: [ ![Build Status](https://app.codeship.com/projects/04cf1b10-da68-0134-0795-3a4993b56c58/status?branch=master)](https://app.codeship.com/projects/203652)
-develop: [ ![Build Status](https://app.codeship.com/projects/04cf1b10-da68-0134-0795-3a4993b56c58/status?branch=develop)](https://app.codeship.com/projects/203652)
+[ ![Build Status](https://app.codeship.com/projects/04cf1b10-da68-0134-0795-3a4993b56c58/status?branch=master)](https://app.codeship.com/projects/203652) ^(master)^  
+[ ![Build Status](https://app.codeship.com/projects/04cf1b10-da68-0134-0795-3a4993b56c58/status?branch=develop)](https://app.codeship.com/projects/203652) ^(develop)^
 
 Introduction
 ------------

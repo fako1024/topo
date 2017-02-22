@@ -33,28 +33,28 @@ const (
 	_NUMPlugins // KEEP AT BOTTOM (AND DO NOT ADD TO PluginStrings)
 )
 
-// All plugins (to be sorted)
-var allPlugins = []PluginType{
-	A,
-	B,
-	C,
-	D,
-	E,
-	F,
-	G,
-	H,
-}
-
-// All plugin dependencies
-var pluginDependencies = []Dependency{
-	Dependency{Child: B, Parent: A},
-	Dependency{Child: B, Parent: C},
-	Dependency{Child: B, Parent: D},
-	Dependency{Child: A, Parent: E},
-	Dependency{Child: D, Parent: C},
-}
-
 func TestIotaType(t *testing.T) {
+
+	// All plugins (to be sorted)
+	var allPlugins = []PluginType{
+		A,
+		B,
+		C,
+		D,
+		E,
+		F,
+		G,
+		H,
+	}
+
+	// All plugin dependencies
+	var pluginDependencies = []Dependency{
+		Dependency{Child: B, Parent: A},
+		Dependency{Child: B, Parent: C},
+		Dependency{Child: B, Parent: D},
+		Dependency{Child: A, Parent: E},
+		Dependency{Child: D, Parent: C},
+	}
 
 	// Getter function to convert original elements to a generic type
 	getter := func(i int) Type {

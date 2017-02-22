@@ -12,7 +12,55 @@ import (
 	"testing"
 )
 
+func testEq(a, b []string) bool {
+
+	if a == nil && b == nil {
+		return true
+	}
+
+	if a == nil || b == nil {
+		return false
+	}
+
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 func TestDepString(t *testing.T) {
+
+	// All plugin dependencies
+	var pluginDependencies = []Dependency{
+		Dependency{Child: B, Parent: A},
+		Dependency{Child: B, Parent: C},
+		Dependency{Child: B, Parent: D},
+		Dependency{Child: A, Parent: E},
+		Dependency{Child: D, Parent: C},
+	}
+
+	// All string dependencies
+	var stringDependencies = []Dependency{
+		Dependency{Child: "B", Parent: "A"},
+		Dependency{Child: "B", Parent: "C"},
+		Dependency{Child: "B", Parent: "D"},
+		Dependency{Child: "A", Parent: "E"},
+		Dependency{Child: "D", Parent: "C"},
+	}
+
+	// List of all struct dependencies
+	var structDependencies = []Dependency{
+		Dependency{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
+		Dependency{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
+	}
+
 	if pluginDependencies[0].String() != "Plugin 1 depends upon Plugin 0" {
 		t.Fatalf("Unexpected dependency string, want \"Plugin 1 depends upon Plugin 0\", got \"%s\"", pluginDependencies[0].String())
 	}
@@ -26,7 +74,20 @@ func TestDepString(t *testing.T) {
 
 func TestSortInline(t *testing.T) {
 
-	// Based on example_struct_test.go
+	// List of all structs (to be sorted)
+	var allStructs = []StructType{
+		StructType{"A", 1, 1.0},
+		StructType{"B", 2, 2.0},
+		StructType{"C", 3, 3.0},
+		StructType{"D", 4, 4.0},
+		StructType{"E", 5, 5.0},
+	}
+
+	// List of all struct dependencies
+	var structDependencies = []Dependency{
+		Dependency{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
+		Dependency{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
+	}
 
 	// Perform topological sort (inline)
 	err := Sort(allStructs, structDependencies, func(i int) Type { return allStructs[i] }, func(i int, val Type) { allStructs[i] = val.(StructType) })
@@ -53,7 +114,60 @@ func TestSortInline(t *testing.T) {
 	}
 }
 
+func TestSortNoDeps(t *testing.T) {
+
+	// List of all simple strings (to be sorted)
+	var allStrings = []string{
+		"A",
+		"B",
+		"C",
+		"D",
+		"E",
+		"F",
+		"G",
+		"H",
+	}
+
+	// No dependencies
+	var stringEmptyDependencies = []Dependency{}
+
+	// Getter function to convert original elements to a generic type
+	getter := func(i int) Type {
+		return allStrings[i]
+	}
+
+	// Setter function to restore the original type of the data
+	setter := func(i int, val Type) {
+		allStrings[i] = val.(string)
+	}
+
+	// Save original data
+	allStringsOld := make([]string, len(allStrings))
+	copy(allStringsOld, allStrings)
+
+	// Perform topological sort
+	if err := Sort(allStrings, stringEmptyDependencies, getter, setter); err != nil {
+		t.Fatalf("Error sorting with empty dependencies: %s", err)
+	}
+
+	if !testEq(allStrings, allStringsOld) {
+		t.Fatalf("Unexpected change detected, original: %v , sorted %v, want identical results", allStringsOld, allStrings)
+	}
+}
+
 func TestSortCyclic(t *testing.T) {
+
+	// List of all simple strings (to be sorted)
+	var allStrings = []string{
+		"A",
+		"B",
+		"C",
+		"D",
+		"E",
+		"F",
+		"G",
+		"H",
+	}
 
 	// Based on example_simple_test.go
 	var stringCyclicDependencies = []Dependency{
@@ -79,11 +193,23 @@ func TestSortCyclic(t *testing.T) {
 	if err := Sort(allStrings, stringCyclicDependencies, getter, setter); err == nil {
 		t.Fatal("Expected cyclic error not seen")
 	} else if !strings.Contains(err.Error(), "Cycle error:") {
-		t.Errorf("Unexpected error message: %s", err)
+		t.Fatalf("Unexpected error message: %s", err)
 	}
 }
 
 func TestSortNonExistVertex(t *testing.T) {
+
+	// List of all simple strings (to be sorted)
+	var allStrings = []string{
+		"A",
+		"B",
+		"C",
+		"D",
+		"E",
+		"F",
+		"G",
+		"H",
+	}
 
 	// Based on example_simple_test.go
 	var stringNonExistVertexDependencies = []Dependency{

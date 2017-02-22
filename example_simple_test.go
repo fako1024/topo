@@ -9,28 +9,28 @@ package topo
 
 import "testing"
 
-// List of all simple strings (to be sorted)
-var allStrings = []string{
-	"A",
-	"B",
-	"C",
-	"D",
-	"E",
-	"F",
-	"G",
-	"H",
-}
-
-// All string dependencies
-var stringDependencies = []Dependency{
-	Dependency{Child: "B", Parent: "A"},
-	Dependency{Child: "B", Parent: "C"},
-	Dependency{Child: "B", Parent: "D"},
-	Dependency{Child: "A", Parent: "E"},
-	Dependency{Child: "D", Parent: "C"},
-}
-
 func TestStringType(t *testing.T) {
+
+	// List of all simple strings (to be sorted)
+	var allStrings = []string{
+		"A",
+		"B",
+		"C",
+		"D",
+		"E",
+		"F",
+		"G",
+		"H",
+	}
+
+	// All string dependencies
+	var stringDependencies = []Dependency{
+		Dependency{Child: "B", Parent: "A"},
+		Dependency{Child: "B", Parent: "C"},
+		Dependency{Child: "B", Parent: "D"},
+		Dependency{Child: "A", Parent: "E"},
+		Dependency{Child: "D", Parent: "C"},
+	}
 
 	// Getter function to convert original elements to a generic type
 	getter := func(i int) Type {
@@ -43,7 +43,7 @@ func TestStringType(t *testing.T) {
 	}
 
 	// Perform topological sort
-	if err := Sort(allStructs, stringDependencies, getter, setter); err != nil {
+	if err := Sort(allStrings, stringDependencies, getter, setter); err != nil {
 		t.Fatal(err)
 	}
 

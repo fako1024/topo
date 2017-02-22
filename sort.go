@@ -35,6 +35,11 @@ func (d Dependency) String() string {
 // finally converting back the resulting object list to the original slice (sort in place)
 func Sort(data interface{}, deps []Dependency, getter func(i int) Type, setter func(i int, val Type)) (err error) {
 
+	// In case there are no dependencies, return immediately without action
+	if len(deps) == 0 {
+		return nil
+	}
+
 	// Obtain the number of elements in the original data slice using reflection
 	nObj := reflect.ValueOf(data).Len()
 

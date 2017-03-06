@@ -19,11 +19,12 @@ type Object interface{}
 // arcs in accordance with a discrete graph description
 type Graph struct {
 	vertices map[Object]vertex
+	order    []Object
 }
 
 // NewGraph returns a new graph representation (constructor)
 func NewGraph(objects ...Object) *Graph {
-	gr := Graph{make(map[Object]vertex)}
+	gr := Graph{make(map[Object]vertex), make([]Object, 0)}
 
 	// Optionally add all vertices already provided variadically
 	for _, obj := range objects {
@@ -37,6 +38,7 @@ func NewGraph(objects ...Object) *Graph {
 func (g *Graph) AddVertex(obj Object) {
 	if _, found := g.find(obj); !found {
 		g.vertices[obj] = newVertex()
+		g.order = append(g.order, obj)
 	}
 }
 
@@ -62,7 +64,6 @@ func (g *Graph) AddArc(arcFrom, arcTo Object) error {
 // SortTopological performs a topological sort and returns the sorted list of
 // arbitrary input types
 func (g *Graph) SortTopological() (ObjectList, error) {
-
 	var (
 		results = newList()
 		err     error
@@ -70,7 +71,7 @@ func (g *Graph) SortTopological() (ObjectList, error) {
 
 	// Recursively check each vertex for connected vertices and construct the
 	// sorted list
-	for obj := range g.vertices {
+	for _, obj := range g.order {
 		var seen = newList()
 		if err = g.analyze(obj, results, seen); err != nil {
 			return nil, err

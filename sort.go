@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/fako1024/topo/graph"
+	"topo/graph"
 )
 
 // Type defines a generic data type

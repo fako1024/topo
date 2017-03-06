@@ -12,28 +12,7 @@ import (
 	"testing"
 )
 
-func testEq(a, b []string) bool {
-
-	if a == nil && b == nil {
-		return true
-	}
-
-	if a == nil || b == nil {
-		return false
-	}
-
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-
-	return true
-}
+const nRunsConsistency = 1000
 
 func TestDepString(t *testing.T) {
 
@@ -150,7 +129,7 @@ func TestSortNoDeps(t *testing.T) {
 		t.Fatalf("Error sorting with empty dependencies: %s", err)
 	}
 
-	if !testEq(allStrings, allStringsOld) {
+	if !testEqString(allStrings, allStringsOld) {
 		t.Fatalf("Unexpected change detected, original: %v , sorted %v, want identical results", allStringsOld, allStrings)
 	}
 }

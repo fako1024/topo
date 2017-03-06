@@ -40,14 +40,10 @@ func (s *list) clone() *list {
 	// Pre-allocate result map with the correct number of elements
 	listCopy := &list{make(map[Object]int, len(s.indices)), make(ObjectList, len(s.elements))}
 
-	// Populate copy indices
-	for k, v := range s.indices {
-		listCopy.indices[k] = v
-	}
-
-	// Populate copy elements
+	// Populate copy elements / indices
 	for k, v := range s.elements {
 		listCopy.elements[k] = v
+		listCopy.indices[v] = s.indices[v]
 	}
 
 	return listCopy

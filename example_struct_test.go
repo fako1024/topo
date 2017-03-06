@@ -16,7 +16,7 @@ type StructType struct {
 	Float  float64
 }
 
-func TestStructType(t *testing.T) {
+func testStructType(t *testing.T) []StructType {
 
 	// List of all structs (to be sorted)
 	var allStructs = []StructType{
@@ -64,4 +64,43 @@ func TestStructType(t *testing.T) {
 			t.Fatalf("Unexpected order, want pos(%v) < pos(%v) for %v / %v", posTo, posFrom, dependency.Child, dependency.Parent)
 		}
 	}
+
+	return allStructs
+}
+
+func TestStructType(t *testing.T) {
+	testStringType(t)
+}
+
+func TestStructTypeStability(t *testing.T) {
+	expected := testStructType(t)
+
+	for run := 0; run < nRunsConsistency; run++ {
+		if res := testStructType(t); !testEqStruct(res, expected) {
+			t.Fatalf("API stability violation, want %v, have %v", expected, res)
+		}
+	}
+}
+
+func testEqStruct(a, b []StructType) bool {
+
+	if a == nil && b == nil {
+		return true
+	}
+
+	if a == nil || b == nil {
+		return false
+	}
+
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
 }

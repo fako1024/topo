@@ -9,7 +9,7 @@ package topo
 
 import "testing"
 
-func TestStringType(t *testing.T) {
+func testStringType(t *testing.T) []string {
 
 	// List of all simple strings (to be sorted)
 	var allStrings = []string{
@@ -63,4 +63,43 @@ func TestStringType(t *testing.T) {
 			t.Fatalf("Unexpected order, want pos(%v) < pos(%v) for %v / %v", posTo, posFrom, dependency.Child, dependency.Parent)
 		}
 	}
+
+	return allStrings
+}
+
+func TestStringType(t *testing.T) {
+	testStringType(t)
+}
+
+func TestStringTypeStability(t *testing.T) {
+	expected := testStringType(t)
+
+	for run := 0; run < nRunsConsistency; run++ {
+		if res := testStringType(t); !testEqString(res, expected) {
+			t.Fatalf("API stability violation, want %s, have %s", expected, res)
+		}
+	}
+}
+
+func testEqString(a, b []string) bool {
+
+	if a == nil && b == nil {
+		return true
+	}
+
+	if a == nil || b == nil {
+		return false
+	}
+
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
 }

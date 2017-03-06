@@ -46,7 +46,7 @@ func Sort(data interface{}, deps []Dependency, getter func(i int) Type, setter f
 In order to perform a dependency resolution, first a slice or array containing all elements to be sorted and a list of all dependencies have to be created.
 Afterwards, a "Getter" and a "Setter" function have to be defined in order to perform the actual type conversion for the type in question.
 Finally, the actual Sort() call can be performed, causing the original slice to be sorted in-place so as to satisfy all dependencies.
-Note that Sort() is not a stable sort algorithm, hence the actual order of elements in the output may vary. A detailed, yet simple example can be found below.
+Note: Sort() is a stable sort algorithm, hence the actual order of elements in the output will be deterministic. A detailed, yet simple example can be found below.
 
 License
 -------

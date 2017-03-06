@@ -33,8 +33,7 @@ const (
 	_NUMPlugins // KEEP AT BOTTOM (AND DO NOT ADD TO PluginStrings)
 )
 
-func TestIotaType(t *testing.T) {
-
+func testIotaType(t *testing.T) []PluginType {
 	// All plugins (to be sorted)
 	var allPlugins = []PluginType{
 		A,
@@ -87,4 +86,43 @@ func TestIotaType(t *testing.T) {
 			t.Fatalf("Unexpected order, want pos(%v) < pos(%v) for %v / %v", posTo, posFrom, dependency.Child, dependency.Parent)
 		}
 	}
+
+	return allPlugins
+}
+
+func TestIotaType(t *testing.T) {
+	testIotaType(t)
+}
+
+func TestIotaTypeStability(t *testing.T) {
+	expected := testIotaType(t)
+
+	for run := 0; run < nRunsConsistency; run++ {
+		if res := testIotaType(t); !testEqIota(res, expected) {
+			t.Fatalf("API stability violation, want %s, have %s", expected, res)
+		}
+	}
+}
+
+func testEqIota(a, b []PluginType) bool {
+
+	if a == nil && b == nil {
+		return true
+	}
+
+	if a == nil || b == nil {
+		return false
+	}
+
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
 }

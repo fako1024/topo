@@ -45,6 +45,20 @@ func (c *testCase) assessOrder() error {
 	return nil
 }
 
+// find determines if a VertexList contains a specific element
+func (l ObjectList) find(obj Object) (int, bool) {
+
+	// Check if the vertex exists in the list and return its index if it does
+	for i := 0; i < len(l); i++ {
+		if l[i] == obj {
+			return i, true
+		}
+	}
+
+	// If not, indicate non-existence and return negative index
+	return indexNoExist, false
+}
+
 var testTable = []testCase{
 	testCase{
 		graph: NewGraph("a"),

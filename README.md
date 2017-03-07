@@ -38,8 +38,8 @@ type Dependency struct {
 func (d Dependency) String() string
 
 // Sort performs a topological sort on a slice using a functional approach to generalize
-// the input data, construct a directed graph (using the dependency constraints) and
-// finally converting back the resulting object list to the original slice (sort in place)
+// the input data, constructs a directed graph (using the dependency constraints) and
+// finally converts back the resulting object list to the original slice (sort in place)
 func Sort(data interface{}, deps []Dependency, getter func(i int) Type, setter func(i int, val Type)) (err error)
 
 ```
@@ -103,16 +103,12 @@ func main() {
 		fmt.Println(dep)
 	}
 }
-
-}
 ```
 
-This example will generate the following output (note that Sort() is not a stable
-sort algorithm, hence the actual order of elements in the output may vary while
-still satisfying all dependencies):
+This example will generate the following output:
 
 ```
-Sorted list of strings: [G H E A C D B F]
+Sorted list of strings: [E A C D B F G H]
 The following dependencies were taken into account:
 B depends upon A
 B depends upon C

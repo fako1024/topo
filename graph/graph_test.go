@@ -26,10 +26,14 @@ type testCase struct {
 	result ObjectList
 }
 
-func (c *testCase) init() {
+func (c *testCase) init() error {
 	for _, arc := range c.arcs {
-		c.graph.AddArc(arc.from, arc.to)
+		if err := c.graph.AddArc(arc.from, arc.to); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 func (c *testCase) assessOrder() error {
@@ -98,8 +102,8 @@ func TestGraphInteraction(t *testing.T) {
 
 	graph := NewGraph()
 	result, err := graph.SortTopological()
-	if len(result) != 0 {
-		t.Fatal("Expected empty result, got", result.String())
+	if err != nil || len(result) != 0 {
+		t.Fatalf("Expected empty result and no error, got %s and %s", result, err)
 	}
 	_ = result.String()
 
@@ -128,11 +132,11 @@ func TestGraphTable(t *testing.T) {
 	var err error
 	for nRun := 0; nRun < nRunTestTable; nRun++ {
 		for _, test := range testTable {
-			test.init()
+			if err = test.init(); err != nil {
+				t.Fatal(err)
+			}
 
-			test.result, err = test.graph.SortTopological()
-
-			if err != nil {
+			if test.result, err = test.graph.SortTopological(); err != nil {
 				t.Fatal(err)
 			}
 
@@ -150,9 +154,16 @@ func TestGraphTable(t *testing.T) {
 func TestGraphCyclic(t *testing.T) {
 	cyclicGraph := NewGraph("a", "b", "c", "d")
 
-	cyclicGraph.AddArc("a", "b")
-	cyclicGraph.AddArc("b", "c")
-	cyclicGraph.AddArc("c", "a")
+	var err error
+	if err = cyclicGraph.AddArc("a", "b"); err != nil {
+		t.Fatalf("Error adding arc: %s", err)
+	}
+	if err = cyclicGraph.AddArc("b", "c"); err != nil {
+		t.Fatalf("Error adding arc: %s", err)
+	}
+	if err = cyclicGraph.AddArc("c", "a"); err != nil {
+		t.Fatalf("Error adding arc: %s", err)
+	}
 
 	if _, err := cyclicGraph.SortTopological(); err == nil {
 		t.Fatal("Expected cyclic error not seen")

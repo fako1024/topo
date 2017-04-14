@@ -30,7 +30,6 @@ const (
 	F
 	G
 	H
-	_NUMPlugins // KEEP AT BOTTOM (AND DO NOT ADD TO PluginStrings)
 )
 
 func testIotaType(t *testing.T) []PluginType {

@@ -1,7 +1,6 @@
 # Topological Sort for arbitrary slices
 
-[ ![Build Status](https://app.codeship.com/projects/04cf1b10-da68-0134-0795-3a4993b56c58/status?branch=master)](https://app.codeship.com/projects/203652) <sup>(master)</sup>  
-[ ![Build Status](https://app.codeship.com/projects/04cf1b10-da68-0134-0795-3a4993b56c58/status?branch=develop)](https://app.codeship.com/projects/203652) <sup>(develop)</sup>
+![Build/Test Status](https://github.com/fako1024/topo/workflows/Go/badge.svg)
 
 Introduction
 ------------

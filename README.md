@@ -1,9 +1,9 @@
 # Topological Sort for arbitrary slices
 
-[![Github Release](https://img.shields.io/github/release/fako1024/topp.svg)](https://github.com/fako1024/topp/releases)
-[![GoDoc](https://godoc.org/github.com/fako1024/topp?status.svg)](https://godoc.org/github.com/fako1024/topp/)
-[![Go Report Card](https://goreportcard.com/badge/github.com/fako1024/topp)](https://goreportcard.com/report/github.com/fako1024/topp)
-[![Build/Test Status](https://github.com/fako1024/topp/workflows/Go/badge.svg)](https://github.com/fako1024/topp/actions?query=workflow%3AGo)
+[![Github Release](https://img.shields.io/github/release/fako1024/topo.svg)](https://github.com/fako1024/topo/releases)
+[![GoDoc](https://godoc.org/github.com/fako1024/topo?status.svg)](https://godoc.org/github.com/fako1024/topo/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/fako1024/topo)](https://goreportcard.com/report/github.com/fako1024/topo)
+[![Build/Test Status](https://github.com/fako1024/topo/workflows/Go/badge.svg)](https://github.com/fako1024/topo/actions?query=workflow%3AGo)
 
 Introduction
 ------------

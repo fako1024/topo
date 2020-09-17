@@ -47,11 +47,11 @@ func testIotaType(t *testing.T) []PluginType {
 
 	// All plugin dependencies
 	var pluginDependencies = []Dependency{
-		Dependency{Child: B, Parent: A},
-		Dependency{Child: B, Parent: C},
-		Dependency{Child: B, Parent: D},
-		Dependency{Child: A, Parent: E},
-		Dependency{Child: D, Parent: C},
+		{Child: B, Parent: A},
+		{Child: B, Parent: C},
+		{Child: B, Parent: D},
+		{Child: A, Parent: E},
+		{Child: D, Parent: C},
 	}
 
 	// Getter function to convert original elements to a generic type

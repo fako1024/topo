@@ -18,26 +18,26 @@ func TestDepString(t *testing.T) {
 
 	// All plugin dependencies
 	var pluginDependencies = []Dependency{
-		Dependency{Child: B, Parent: A},
-		Dependency{Child: B, Parent: C},
-		Dependency{Child: B, Parent: D},
-		Dependency{Child: A, Parent: E},
-		Dependency{Child: D, Parent: C},
+		{Child: B, Parent: A},
+		{Child: B, Parent: C},
+		{Child: B, Parent: D},
+		{Child: A, Parent: E},
+		{Child: D, Parent: C},
 	}
 
 	// All string dependencies
 	var stringDependencies = []Dependency{
-		Dependency{Child: "B", Parent: "A"},
-		Dependency{Child: "B", Parent: "C"},
-		Dependency{Child: "B", Parent: "D"},
-		Dependency{Child: "A", Parent: "E"},
-		Dependency{Child: "D", Parent: "C"},
+		{Child: "B", Parent: "A"},
+		{Child: "B", Parent: "C"},
+		{Child: "B", Parent: "D"},
+		{Child: "A", Parent: "E"},
+		{Child: "D", Parent: "C"},
 	}
 
 	// List of all struct dependencies
 	var structDependencies = []Dependency{
-		Dependency{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
-		Dependency{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
+		{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
+		{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
 	}
 
 	if pluginDependencies[0].String() != "Plugin 1 depends upon Plugin 0" {
@@ -55,17 +55,17 @@ func TestSortInline(t *testing.T) {
 
 	// List of all structs (to be sorted)
 	var allStructs = []StructType{
-		StructType{"A", 1, 1.0},
-		StructType{"B", 2, 2.0},
-		StructType{"C", 3, 3.0},
-		StructType{"D", 4, 4.0},
-		StructType{"E", 5, 5.0},
+		{"A", 1, 1.0},
+		{"B", 2, 2.0},
+		{"C", 3, 3.0},
+		{"D", 4, 4.0},
+		{"E", 5, 5.0},
 	}
 
 	// List of all struct dependencies
 	var structDependencies = []Dependency{
-		Dependency{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
-		Dependency{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
+		{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
+		{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
 	}
 
 	// Perform topological sort (inline)
@@ -150,12 +150,12 @@ func TestSortCyclic(t *testing.T) {
 
 	// Based on example_simple_test.go
 	var stringCyclicDependencies = []Dependency{
-		Dependency{"B", "A"},
-		Dependency{"B", "C"},
-		Dependency{"B", "D"},
-		Dependency{"A", "E"},
-		Dependency{"D", "C"},
-		Dependency{"C", "B"},
+		{"B", "A"},
+		{"B", "C"},
+		{"B", "D"},
+		{"A", "E"},
+		{"D", "C"},
+		{"C", "B"},
 	}
 
 	// Getter function to convert original elements to a generic type
@@ -192,12 +192,12 @@ func TestSortNonExistVertex(t *testing.T) {
 
 	// Based on example_simple_test.go
 	var stringNonExistVertexDependencies = []Dependency{
-		Dependency{"B", "A"},
-		Dependency{"B", "C"},
-		Dependency{"B", "D"},
-		Dependency{"A", "E"},
-		Dependency{"D", "C"},
-		Dependency{"Z", "B"},
+		{"B", "A"},
+		{"B", "C"},
+		{"B", "D"},
+		{"A", "E"},
+		{"D", "C"},
+		{"Z", "B"},
 	}
 
 	// Getter function to convert original elements to a generic type

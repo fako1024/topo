@@ -64,27 +64,27 @@ func (l ObjectList) find(obj Object) (int, bool) {
 }
 
 var testTable = []testCase{
-	testCase{
+	{
 		graph: NewGraph("a"),
 	},
-	testCase{
+	{
 		graph: NewGraph("a", "b", "c", "d", "e"),
 	},
-	testCase{
+	{
 		graph: NewGraph("a", "b", "c", "d", "e"),
-		arcs:  []testArc{testArc{"a", "b"}, testArc{"b", "c"}, testArc{"c", "d"}},
+		arcs:  []testArc{{"a", "b"}, {"b", "c"}, {"c", "d"}},
 	},
-	testCase{
+	{
 		graph: NewGraph("a", "b", "c", "d", "e"),
-		arcs:  []testArc{testArc{"a", "b"}, testArc{"c", "b"}, testArc{"e", "d"}},
+		arcs:  []testArc{{"a", "b"}, {"c", "b"}, {"e", "d"}},
 	},
-	testCase{
+	{
 		graph: NewGraph(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-		arcs:  []testArc{testArc{7, 8}, testArc{7, 1}, testArc{7, 3}, testArc{2, 7}},
+		arcs:  []testArc{{7, 8}, {7, 1}, {7, 3}, {2, 7}},
 	},
-	testCase{
+	{
 		graph: NewGraph(1, 2.63535, 3, 4, 5, 6, "A", 8, 9, 10),
-		arcs:  []testArc{testArc{"A", 8}, testArc{"A", 1}, testArc{"A", 3}, testArc{5, "A"}, testArc{2.63535, 1}},
+		arcs:  []testArc{{"A", 8}, {"A", 1}, {"A", 3}, {5, "A"}, {2.63535, 1}},
 	},
 }
 

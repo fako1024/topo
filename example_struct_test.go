@@ -20,17 +20,17 @@ func testStructType(t *testing.T) []StructType {
 
 	// List of all structs (to be sorted)
 	var allStructs = []StructType{
-		StructType{"A", 1, 1.0},
-		StructType{"B", 2, 2.0},
-		StructType{"C", 3, 3.0},
-		StructType{"D", 4, 4.0},
-		StructType{"E", 5, 5.0},
+		{"A", 1, 1.0},
+		{"B", 2, 2.0},
+		{"C", 3, 3.0},
+		{"D", 4, 4.0},
+		{"E", 5, 5.0},
 	}
 
 	// List of all struct dependencies
 	var structDependencies = []Dependency{
-		Dependency{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
-		Dependency{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
+		{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
+		{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
 	}
 
 	// Getter function to convert original elements to a generic type

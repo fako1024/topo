@@ -9,18 +9,18 @@ package graph
 
 // list is a generic structure holding a sorted array of connected vertices and
 // is used to determine the correct ordering and detect cycles
-type list struct {
-	indices  map[Object]int
-	elements ObjectList
+type list[T comparable] struct {
+	indices  map[T]int
+	elements Objects[T]
 }
 
 // newList return a new, empty list (constructor)
-func newList() *list {
-	return &list{make(map[Object]int), make(ObjectList, 0)}
+func newList[T comparable]() *list[T] {
+	return &list[T]{make(map[T]int), make(Objects[T], 0)}
 }
 
 // add indicates if the element already exists and conditionally adds a new element
-func (s *list) add(obj Object) bool {
+func (s *list[T]) add(obj T) bool {
 
 	// Check if the element already exists in the list
 	_, exists := s.indices[obj]
@@ -35,10 +35,10 @@ func (s *list) add(obj Object) bool {
 	return !exists
 }
 
-func (s *list) clone() *list {
+func (s *list[T]) clone() *list[T] {
 
 	// Pre-allocate result map with the correct number of elements
-	listCopy := &list{make(map[Object]int, len(s.indices)), make(ObjectList, len(s.elements))}
+	listCopy := &list[T]{make(map[T]int, len(s.indices)), make(Objects[T], len(s.elements))}
 
 	// Populate copy elements / indices
 	for k, v := range s.elements {
@@ -49,7 +49,7 @@ func (s *list) clone() *list {
 	return listCopy
 }
 
-func (s *list) findIndex(obj Object) (int, bool) {
+func (s *list[T]) findIndex(obj T) (int, bool) {
 
 	// Check if the element exists in the list and return its index if it does
 	if i, ok := s.indices[obj]; ok {

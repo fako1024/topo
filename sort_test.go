@@ -8,8 +8,9 @@
 package topo
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 const nRunsConsistency = 1000
@@ -17,7 +18,7 @@ const nRunsConsistency = 1000
 func TestDepString(t *testing.T) {
 
 	// All plugin dependencies
-	var pluginDependencies = []Dependency{
+	var pluginDependencies = []Dependency[PluginType]{
 		{Child: B, Parent: A},
 		{Child: B, Parent: C},
 		{Child: B, Parent: D},
@@ -26,7 +27,7 @@ func TestDepString(t *testing.T) {
 	}
 
 	// All string dependencies
-	var stringDependencies = []Dependency{
+	var stringDependencies = []Dependency[string]{
 		{Child: "B", Parent: "A"},
 		{Child: "B", Parent: "C"},
 		{Child: "B", Parent: "D"},
@@ -35,20 +36,14 @@ func TestDepString(t *testing.T) {
 	}
 
 	// List of all struct dependencies
-	var structDependencies = []Dependency{
+	var structDependencies = []Dependency[StructType]{
 		{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
 		{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
 	}
 
-	if pluginDependencies[0].String() != "Plugin 1 depends upon Plugin 0" {
-		t.Fatalf("Unexpected dependency string, want \"Plugin 1 depends upon Plugin 0\", got \"%s\"", pluginDependencies[0].String())
-	}
-	if stringDependencies[0].String() != "B depends upon A" {
-		t.Fatalf("Unexpected dependency string, want \"B depends upon A\", got \"%s\"", stringDependencies[0].String())
-	}
-	if structDependencies[0].String() != "{A 1 1} depends upon {C 3 3}" {
-		t.Fatalf("Unexpected dependency string, want \"{A 1 1} depends upon {C 3 3}\", got \"%s\"", structDependencies[0].String())
-	}
+	require.Equal(t, pluginDependencies[0].String(), "Plugin 1 depends upon Plugin 0")
+	require.Equal(t, stringDependencies[0].String(), "B depends upon A")
+	require.Equal(t, structDependencies[0].String(), "{A 1 1} depends upon {C 3 3}")
 }
 
 func TestSortInline(t *testing.T) {
@@ -63,14 +58,13 @@ func TestSortInline(t *testing.T) {
 	}
 
 	// List of all struct dependencies
-	var structDependencies = []Dependency{
+	var structDependencies = []Dependency[StructType]{
 		{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
 		{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
 	}
 
 	// Perform topological sort (inline)
-	err := Sort(allStructs, structDependencies, func(i int) Type { return allStructs[i] }, func(i int, val Type) { allStructs[i] = val.(StructType) })
-
+	err := Sort(allStructs, structDependencies)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,9 +81,7 @@ func TestSortInline(t *testing.T) {
 			}
 		}
 
-		if posTo >= posFrom {
-			t.Fatalf("Unexpected order, want pos(%v) < pos(%v) for %v / %v", posTo, posFrom, dependency.Child, dependency.Parent)
-		}
+		require.Less(t, posTo, posFrom)
 	}
 }
 
@@ -108,30 +100,15 @@ func TestSortNoDeps(t *testing.T) {
 	}
 
 	// No dependencies
-	var stringEmptyDependencies = []Dependency{}
-
-	// Getter function to convert original elements to a generic type
-	getter := func(i int) Type {
-		return allStrings[i]
-	}
-
-	// Setter function to restore the original type of the data
-	setter := func(i int, val Type) {
-		allStrings[i] = val.(string)
-	}
+	var stringEmptyDependencies = []Dependency[string]{}
 
 	// Save original data
 	allStringsOld := make([]string, len(allStrings))
 	copy(allStringsOld, allStrings)
 
 	// Perform topological sort
-	if err := Sort(allStrings, stringEmptyDependencies, getter, setter); err != nil {
-		t.Fatalf("Error sorting with empty dependencies: %s", err)
-	}
-
-	if !testEqString(allStrings, allStringsOld) {
-		t.Fatalf("Unexpected change detected, original: %v , sorted %v, want identical results", allStringsOld, allStrings)
-	}
+	require.Nil(t, Sort(allStrings, stringEmptyDependencies))
+	require.EqualValues(t, allStrings, allStringsOld)
 }
 
 func TestSortCyclic(t *testing.T) {
@@ -149,7 +126,7 @@ func TestSortCyclic(t *testing.T) {
 	}
 
 	// Based on example_simple_test.go
-	var stringCyclicDependencies = []Dependency{
+	var stringCyclicDependencies = []Dependency[string]{
 		{"B", "A"},
 		{"B", "C"},
 		{"B", "D"},
@@ -158,22 +135,8 @@ func TestSortCyclic(t *testing.T) {
 		{"C", "B"},
 	}
 
-	// Getter function to convert original elements to a generic type
-	getter := func(i int) Type {
-		return allStrings[i]
-	}
-
-	// Setter function to restore the original type of the data
-	setter := func(i int, val Type) {
-		allStrings[i] = val.(string)
-	}
-
 	// Perform topological sort
-	if err := Sort(allStrings, stringCyclicDependencies, getter, setter); err == nil {
-		t.Fatal("Expected cyclic error not seen")
-	} else if !strings.Contains(err.Error(), "Cycle error:") {
-		t.Fatalf("Unexpected error message: %s", err)
-	}
+	require.ErrorContains(t, Sort(allStrings, stringCyclicDependencies), "cycle error")
 }
 
 func TestSortNonExistVertex(t *testing.T) {
@@ -191,7 +154,7 @@ func TestSortNonExistVertex(t *testing.T) {
 	}
 
 	// Based on example_simple_test.go
-	var stringNonExistVertexDependencies = []Dependency{
+	var stringNonExistVertexDependencies = []Dependency[string]{
 		{"B", "A"},
 		{"B", "C"},
 		{"B", "D"},
@@ -200,20 +163,6 @@ func TestSortNonExistVertex(t *testing.T) {
 		{"Z", "B"},
 	}
 
-	// Getter function to convert original elements to a generic type
-	getter := func(i int) Type {
-		return allStrings[i]
-	}
-
-	// Setter function to restore the original type of the data
-	setter := func(i int, val Type) {
-		allStrings[i] = val.(string)
-	}
-
 	// Perform topological sort
-	if err := Sort(allStrings, stringNonExistVertexDependencies, getter, setter); err == nil {
-		t.Fatal("Expected error (non-existing vertex) not seen")
-	} else if !strings.Contains(err.Error(), "Source vertex Z not found in graph") {
-		t.Errorf("Unexpected error message: %s", err)
-	}
+	require.ErrorContains(t, Sort(allStrings, stringNonExistVertexDependencies), "source vertex Z not found in graph")
 }

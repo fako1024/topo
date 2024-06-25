@@ -8,47 +8,49 @@
 package topo
 
 import (
+	"errors"
 	"fmt"
-	"reflect"
 
 	"github.com/fako1024/topo/graph"
 )
 
-// Type defines a generic data type
-type Type interface{}
+var (
+	// ErrUnexpectedMismatch is thrown if the sorted graph is inconsistent with the input data
+	ErrUnexpectedMismatch = errors.New("unexpected mismatch between original and sorted data")
+)
 
 // Dependency represents a dependency between one Type and another
-type Dependency struct {
-	Child  Type
-	Parent Type
+type Dependency[T comparable] struct {
+	Child  T
+	Parent T
 }
+
+// Dependencies represents a list of dependencies
+type Dependencies[T comparable] []Dependency[T]
 
 // String tries to stringify a dependency. If the type of the dependency fulfills
 // the Stringer interface, it will use its String() method, otherwise it will try
 // to format the variable otherwise
-func (d Dependency) String() string {
-	return fmt.Sprint(d.Child) + " depends upon " + fmt.Sprint(d.Parent)
+func (d Dependency[T]) String() string {
+	return fmt.Sprintf("%v depends upon %v", d.Child, d.Parent)
 }
 
-// Sort performs a topological sort on a slice using a functional approach to generalize
-// the input data, constructs a directed graph (using the dependency constraints) and
-// finally converts back the resulting object list to the original slice (sort in place)
-func Sort(data interface{}, deps []Dependency, getter func(i int) Type, setter func(i int, val Type)) (err error) {
+// Sort performs a topological sort on a slice and constructs a directed graph (using the
+// dependency constraints) and finally converts back the resulting object list to the
+// original slice (sort in place)
+func Sort[T comparable](data graph.Objects[T], deps Dependencies[T]) (err error) {
 
 	// In case there are no dependencies, return immediately without action
 	if len(deps) == 0 {
 		return nil
 	}
 
-	// Obtain the number of elements in the original data slice using reflection
-	nObj := reflect.ValueOf(data).Len()
-
 	// Instantiate a new (empty) graph
-	gr := graph.NewGraph()
+	gr := graph.NewGraph[T]()
 
-	// Add all vertices (based on slice indices) using the 1st class getter function
-	for i := 0; i < nObj; i++ {
-		gr.AddVertex(getter(i))
+	// Add all vertices (based on slice indices)
+	for i := 0; i < len(data); i++ {
+		gr.AddVertex(data[i])
 	}
 
 	// Add all dependencies (based on the enforced struct fields)
@@ -59,22 +61,19 @@ func Sort(data interface{}, deps []Dependency, getter func(i int) Type, setter f
 	}
 
 	// Perform topological sorting, return error if e.g. a cycle is found
-	var result graph.ObjectList
+	var result graph.Objects[T]
 	if result, err = gr.SortTopological(); err != nil {
 		return
 	}
 
 	// Sanity check to make sure the resulting slice contains the same number of
 	// elements as the original data
-	if len(result) != nObj {
-		panic("Unexpected mismatch between original and sorted data")
+	if len(result) != len(data) {
+		return ErrUnexpectedMismatch
 	}
 
-	// Convert the generic data back to the original slice type using the 1st class
-	// setter function
-	for i, val := range result {
-		setter(i, val)
-	}
+	// Copy the sorted data back to the original slice
+	copy(data, result)
 
 	return
 }

@@ -10,6 +10,8 @@ package topo
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 // PluginType is a dummy type for the iota below
@@ -46,7 +48,7 @@ func testIotaType(t *testing.T) []PluginType {
 	}
 
 	// All plugin dependencies
-	var pluginDependencies = []Dependency{
+	var pluginDependencies = []Dependency[PluginType]{
 		{Child: B, Parent: A},
 		{Child: B, Parent: C},
 		{Child: B, Parent: D},
@@ -54,20 +56,8 @@ func testIotaType(t *testing.T) []PluginType {
 		{Child: D, Parent: C},
 	}
 
-	// Getter function to convert original elements to a generic type
-	getter := func(i int) Type {
-		return allPlugins[i]
-	}
-
-	// Setter function to restore the original type of the data
-	setter := func(i int, val Type) {
-		allPlugins[i] = val.(PluginType)
-	}
-
 	// Perform topological sort
-	if err := Sort(allPlugins, pluginDependencies, getter, setter); err != nil {
-		t.Fatal(err)
-	}
+	require.Nil(t, Sort(allPlugins, pluginDependencies))
 
 	// Check if all dependencies are fulfilled
 	for _, dependency := range pluginDependencies {
@@ -81,9 +71,7 @@ func testIotaType(t *testing.T) []PluginType {
 			}
 		}
 
-		if posTo >= posFrom {
-			t.Fatalf("Unexpected order, want pos(%v) < pos(%v) for %v / %v", posTo, posFrom, dependency.Child, dependency.Parent)
-		}
+		require.Less(t, posTo, posFrom)
 	}
 
 	return allPlugins
@@ -97,31 +85,6 @@ func TestIotaTypeStability(t *testing.T) {
 	expected := testIotaType(t)
 
 	for run := 0; run < nRunsConsistency; run++ {
-		if res := testIotaType(t); !testEqIota(res, expected) {
-			t.Fatalf("API stability violation, want %s, have %s", expected, res)
-		}
+		require.EqualValues(t, expected, testIotaType(t))
 	}
-}
-
-func testEqIota(a, b []PluginType) bool {
-
-	if a == nil && b == nil {
-		return true
-	}
-
-	if a == nil || b == nil {
-		return false
-	}
-
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-
-	return true
 }

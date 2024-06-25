@@ -8,23 +8,23 @@
 package graph
 
 // vertex represents a node / vertex of a graph
-type vertex map[Object]struct{}
+type vertex[T comparable] map[T]struct{}
 
 // newVertex returns a new vertex (constructor)
-func newVertex() vertex {
-	return make(vertex)
+func newVertex[T comparable]() vertex[T] {
+	return make(vertex[T])
 }
 
 // addArc creates a new line / arc to the graph
-func (v vertex) addArc(arc Object) {
+func (v vertex[T]) addArc(arc T) {
 	v[arc] = struct{}{}
 }
 
 // arcs returns a list of all lines / arcs a graph contains
-func (v vertex) arcs() ObjectList {
+func (v vertex[T]) arcs() Objects[T] {
 
 	// Pre-allocate the list of arcs with the correct number of elements
-	list := make([]Object, len(v))
+	list := make(Objects[T], len(v))
 	pos := 0
 
 	// Populate the list of arcs

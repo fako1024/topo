@@ -10,10 +10,10 @@ package graph
 import "fmt"
 
 // ObjectList represents a simple list of arbitrary objects
-type ObjectList []Object
+type Objects[T comparable] []T
 
 // string returns a generic string denoting the connection between contained vertices
-func (l ObjectList) String() string {
+func (l Objects[T]) String() string {
 
 	// Return empty string if the vertex list is empty
 	if len(l) == 0 {

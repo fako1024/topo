@@ -7,7 +7,11 @@
 
 package topo
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
 
 func testStringType(t *testing.T) []string {
 
@@ -24,7 +28,7 @@ func testStringType(t *testing.T) []string {
 	}
 
 	// All string dependencies
-	var stringDependencies = []Dependency{
+	var stringDependencies = []Dependency[string]{
 		{Child: "B", Parent: "A"},
 		{Child: "B", Parent: "C"},
 		{Child: "B", Parent: "D"},
@@ -32,20 +36,8 @@ func testStringType(t *testing.T) []string {
 		{Child: "D", Parent: "C"},
 	}
 
-	// Getter function to convert original elements to a generic type
-	getter := func(i int) Type {
-		return allStrings[i]
-	}
-
-	// Setter function to restore the original type of the data
-	setter := func(i int, val Type) {
-		allStrings[i] = val.(string)
-	}
-
 	// Perform topological sort
-	if err := Sort(allStrings, stringDependencies, getter, setter); err != nil {
-		t.Fatal(err)
-	}
+	require.Nil(t, Sort(allStrings, stringDependencies))
 
 	// Check if all StrDependencies are fulfilled
 	for _, dependency := range stringDependencies {
@@ -59,9 +51,7 @@ func testStringType(t *testing.T) []string {
 			}
 		}
 
-		if posTo >= posFrom {
-			t.Fatalf("Unexpected order, want pos(%v) < pos(%v) for %v / %v", posTo, posFrom, dependency.Child, dependency.Parent)
-		}
+		require.Less(t, posTo, posFrom)
 	}
 
 	return allStrings
@@ -73,33 +63,7 @@ func TestStringType(t *testing.T) {
 
 func TestStringTypeStability(t *testing.T) {
 	expected := testStringType(t)
-
 	for run := 0; run < nRunsConsistency; run++ {
-		if res := testStringType(t); !testEqString(res, expected) {
-			t.Fatalf("API stability violation, want %s, have %s", expected, res)
-		}
+		require.EqualValues(t, expected, testStringType(t))
 	}
-}
-
-func testEqString(a, b []string) bool {
-
-	if a == nil && b == nil {
-		return true
-	}
-
-	if a == nil || b == nil {
-		return false
-	}
-
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-
-	return true
 }

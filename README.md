@@ -22,32 +22,31 @@ To install it, run:
 API summary
 -----------------
 
-The API of the topo package is fairly straight-forward. The following types / methods are exposed:
+The API of the topo package is fairly straight-forward. The following generics-based types / methods are exposed:
 
 ```Go
-// Type defines a generic data type
-type Type interface{}
-
 // Dependency represents a dependency between one Type and another
-type Dependency struct {
-	Child  Type
-	Parent Type
+type Dependency[T comparable] struct {
+	Child  T
+	Parent T
 }
+
+// Dependencies represents a list of dependencies
+type Dependencies[T comparable] []Dependency[T]
 
 // String tries to stringify a dependency. If the type of the dependency fulfills
 // the Stringer interface, it will use its String() method, otherwise it will try
 // to format the variable otherwise
-func (d Dependency) String() string
+func (d Dependency[T]) String() string
 
-// Sort performs a topological sort on a slice using a functional approach to generalize
-// the input data, constructs a directed graph (using the dependency constraints) and
-// finally converts back the resulting object list to the original slice (sort in place)
-func Sort(data interface{}, deps []Dependency, getter func(i int) Type, setter func(i int, val Type)) (err error)
+// Sort performs a topological sort on a slice and constructs a directed graph (using the
+// dependency constraints) and finally converts back the resulting object list to the
+// original slice (sort in place)
+func Sort[T comparable](data graph.Objects[T], deps Dependencies[T]) (err error)
 
 ```
 In order to perform a dependency resolution, first a slice or array containing all elements to be sorted and a list of all dependencies have to be created.
-Afterwards, a "Getter" and a "Setter" function have to be defined in order to perform the actual type conversion for the type in question.
-Finally, the actual Sort() call can be performed, causing the original slice to be sorted in-place so as to satisfy all dependencies.
+Afterwards, the actual Sort() call can be performed, causing the original slice to be sorted in-place so as to satisfy all dependencies.
 Note: Sort() is a stable sort algorithm, hence the actual order of elements in the output will be deterministic. A detailed, yet simple example can be found below.
 
 License
@@ -73,27 +72,18 @@ var stringsToSort = []string{
 }
 
 // List of dependencies
-var stringDependencies = []topo.Dependency{
-	topo.Dependency{Child: "B", Parent: "A"},
-	topo.Dependency{Child: "B", Parent: "C"},
-	topo.Dependency{Child: "B", Parent: "D"},
-	topo.Dependency{Child: "A", Parent: "E"},
-	topo.Dependency{Child: "D", Parent: "C"},
+var stringDependencies = []topo.Dependency[string]{
+	{Child: "B", Parent: "A"},
+	{Child: "B", Parent: "C"},
+	{Child: "B", Parent: "D"},
+	{Child: "A", Parent: "E"},
+	{Child: "D", Parent: "C"},
 }
 
 func main() {
-	// Getter function to convert original elements to a generic type
-	getter := func(i int) topo.Type {
-		return stringsToSort[i]
-	}
-
-	// Setter function to restore the original type of the data
-	setter := func(i int, val topo.Type) {
-		stringsToSort[i] = val.(string)
-	}
 
 	// Perform topological sort
-	if err := topo.Sort(stringsToSort, stringDependencies, getter, setter); err != nil {
+	if err := topo.Sort(stringsToSort, stringDependencies); err != nil {
 		fmt.Printf("Error performing topological sort on slice of strings: %s\n", err)
 		os.Exit(1)
 	}

@@ -12,19 +12,16 @@ import "fmt"
 // Indicates the non-existence in find() methods
 const indexNoExist = -1
 
-// Object defines a generic data type
-type Object interface{}
-
 // Graph represents the relations of arbitrary objects by designating vertices and
 // arcs in accordance with a discrete graph description
-type Graph struct {
-	vertices map[Object]vertex
-	order    []Object
+type Graph[T comparable] struct {
+	vertices map[T]vertex[T]
+	order    []T
 }
 
 // NewGraph returns a new graph representation (constructor)
-func NewGraph(objects ...Object) *Graph {
-	gr := Graph{make(map[Object]vertex), make([]Object, 0)}
+func NewGraph[T comparable](objects ...T) *Graph[T] {
+	gr := Graph[T]{make(map[T]vertex[T]), make([]T, 0)}
 
 	// Optionally add all vertices already provided variadically
 	for _, obj := range objects {
@@ -35,24 +32,25 @@ func NewGraph(objects ...Object) *Graph {
 }
 
 // AddVertex adds a node / vertex to the graph
-func (g *Graph) AddVertex(obj Object) {
+func (g *Graph[T]) AddVertex(obj T) {
 	if _, found := g.find(obj); !found {
-		g.vertices[obj] = newVertex()
+		g.vertices[obj] = newVertex[T]()
 		g.order = append(g.order, obj)
 	}
 }
 
 // AddArc adds a line / arc to the graph
-func (g *Graph) AddArc(arcFrom, arcTo Object) error {
+func (g *Graph[T]) AddArc(arcFrom, arcTo T) error {
+
 	// Check if the "source" vertex exists
 	sourceVertex, ok := g.vertices[arcFrom]
 	if !ok {
-		return fmt.Errorf("Source vertex %v not found in graph", arcFrom)
+		return fmt.Errorf("source vertex %v not found in graph", arcFrom)
 	}
 
 	// Check if the "destination" vertex exists
 	if _, ok := g.vertices[arcTo]; !ok {
-		return fmt.Errorf("Destination vertex %v not found in graph", arcTo)
+		return fmt.Errorf("destination vertex %v not found in graph", arcTo)
 	}
 
 	// Add the arc from "source" to "destination" vertex
@@ -63,16 +61,16 @@ func (g *Graph) AddArc(arcFrom, arcTo Object) error {
 
 // SortTopological performs a topological sort and returns the sorted list of
 // arbitrary input types
-func (g *Graph) SortTopological() (ObjectList, error) {
+func (g *Graph[T]) SortTopological() (Objects[T], error) {
 	var (
-		results = newList()
+		results = newList[T]()
 		err     error
 	)
 
 	// Recursively check each vertex for connected vertices and construct the
 	// sorted list
 	for _, obj := range g.order {
-		var seen = newList()
+		var seen = newList[T]()
 		if err = g.analyze(obj, results, seen); err != nil {
 			return nil, err
 		}
@@ -84,15 +82,14 @@ func (g *Graph) SortTopological() (ObjectList, error) {
 ////////////////// Private methods /////////////////////////////////////////////
 
 // Find determines if a graph contains a specific vertex
-func (g *Graph) find(obj Object) (vertex, bool) {
+func (g *Graph[T]) find(obj T) (vertex[T], bool) {
 	val, ok := g.vertices[obj]
-
 	return val, ok
 }
 
 // analyze recursively parses all graph vertices and their connections to other
 // vertices, constructing the topologically sorted list in the process
-func (g *Graph) analyze(obj Object, results, seen *list) (err error) {
+func (g *Graph[T]) analyze(obj T, results, seen *list[T]) (err error) {
 
 	// Try to add the current vertex to the sorted list
 	if isNewElement := seen.add(obj); !isNewElement {
@@ -105,7 +102,7 @@ func (g *Graph) analyze(obj Object, results, seen *list) (err error) {
 		cycle := append(seen.elements[index:], obj)
 
 		// Return descriptive error indicating the cycle
-		return fmt.Errorf("Cycle error: %s", cycle.String())
+		return fmt.Errorf("cycle error: %s", cycle.String())
 	}
 
 	// Recursively analyze next layer of graph

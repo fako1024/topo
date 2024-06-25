@@ -7,7 +7,11 @@
 
 package topo
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
 
 // StructType is a struct type
 type StructType struct {
@@ -28,25 +32,13 @@ func testStructType(t *testing.T) []StructType {
 	}
 
 	// List of all struct dependencies
-	var structDependencies = []Dependency{
+	var structDependencies = []Dependency[StructType]{
 		{Child: StructType{"A", 1, 1.0}, Parent: StructType{"C", 3, 3.0}},
 		{Child: StructType{"D", 4, 4.0}, Parent: StructType{"E", 5, 5.0}},
 	}
 
-	// Getter function to convert original elements to a generic type
-	getter := func(i int) Type {
-		return allStructs[i]
-	}
-
-	// Setter function to restore the original type of the data
-	setter := func(i int, val Type) {
-		allStructs[i] = val.(StructType)
-	}
-
 	// Perform topological sort
-	if err := Sort(allStructs, structDependencies, getter, setter); err != nil {
-		t.Fatal(err)
-	}
+	require.Nil(t, Sort(allStructs, structDependencies))
 
 	// Check if all StrDependencies are fulfilled
 	for _, dependency := range structDependencies {
@@ -60,9 +52,7 @@ func testStructType(t *testing.T) []StructType {
 			}
 		}
 
-		if posTo >= posFrom {
-			t.Fatalf("Unexpected order, want pos(%v) < pos(%v) for %v / %v", posTo, posFrom, dependency.Child, dependency.Parent)
-		}
+		require.Less(t, posTo, posFrom)
 	}
 
 	return allStructs
@@ -74,33 +64,7 @@ func TestStructType(t *testing.T) {
 
 func TestStructTypeStability(t *testing.T) {
 	expected := testStructType(t)
-
 	for run := 0; run < nRunsConsistency; run++ {
-		if res := testStructType(t); !testEqStruct(res, expected) {
-			t.Fatalf("API stability violation, want %v, have %v", expected, res)
-		}
+		require.EqualValues(t, expected, testStructType(t))
 	}
-}
-
-func testEqStruct(a, b []StructType) bool {
-
-	if a == nil && b == nil {
-		return true
-	}
-
-	if a == nil || b == nil {
-		return false
-	}
-
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-
-	return true
 }
